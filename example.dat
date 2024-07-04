@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE datafile PUBLIC "-//Logiqx//DTD ROM Management Datafile//EN" "http://www.logiqx.com/Dats/datafile.dtd">
+<datafile>
+	<header>
+		<name>Sony - PlayStation 2</name>
+		<description>Sony - PlayStation 2 - Discs (11473) (2024-06-26 14-44-10)</description>
+		<version>2024-06-26 14-44-10</version>
+		<date>2024-06-26 14-44-10</date>
+		<author>redump.org</author>
+		<homepage>redump.org</homepage>
+		<url>http://redump.org/</url>
+	</header>
+	<game name="DreamWorks &amp; Aardman Flushed Away (USA)">
+		<category>Games</category>
+		<description>DreamWorks &amp; Aardman Flushed Away (USA)</description>
+		<rom name="DreamWorks &amp; Aardman Flushed Away (USA).iso" size="1806008320" crc="94269d68" md5="593b8aaeb1d6bc97fcdf4bd244b75393" sha1="4d4c1da46b6788f01b8e63aa65f2c5802e4fc59d"/>
+	</game>
+</datafile>
