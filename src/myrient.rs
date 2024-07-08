@@ -1,7 +1,9 @@
 use std::collections::HashMap;
-use std::io::{self, Write};
+use std::fs::File;
+use std::io::{self, Read};
 use std::path::Path;
 
+use colored::Colorize;
 use indicatif::{ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 use reqwest::blocking::Client;
@@ -29,9 +31,17 @@ pub struct Rom {
     pub file: String,
     pub url: String,
 }
-impl Rom {
-    pub fn to_string(&self) -> String {
-        format!("{}: {}", self.name, self.file)
+struct DownloadProgress<R> {
+    inner: R,
+    progress_bar: ProgressBar,
+}
+
+impl<R: Read> Read for DownloadProgress<R> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.inner.read(buf).map(|n| {
+            self.progress_bar.inc(n as u64);
+            n
+        })
     }
 }
 
@@ -179,84 +189,33 @@ pub fn get_roms_for_collection(html: &String) -> HashMap<String, Rom> {
     roms
 }
 
-// def download(outputPath: str, wantedfile: RomMeta, fileIndex: int, totalDownloadCount: int):
-//     resumedl = False
-//     proceeddl = True
-
-//     if platform.system() == 'Linux':
-//         localpath = f'{outputPath}/{wantedfile["file"]}'
-//     elif platform.system() == 'Windows':
-//         localpath = f'{outputPath}\{wantedfile["file"]}'
-
-//     logger(f'Checking    {str(fileIndex).zfill(len(str(totalDownloadCount)))}/{totalDownloadCount}: {wantedfile["name"]}', 'cyan')
-//     resp = start_stream(wantedfile)
-
-//     remotefilesize = int(resp.headers.get('content-length'))
-
-//     if os.path.isfile(localpath):
-//         localfilesize = int(os.path.getsize(localpath))
-//         if localfilesize != remotefilesize:
-//             resumedl = True
-//         else:
-//             proceeddl = False
-
-//     if proceeddl:
-//         file = open(localpath, 'ab')
-
-//         size, unit = scale1024(remotefilesize)
-//         pbar = ProgressBar(widgets=['\033[96m', Percentage(), ' | ', DataSize(), f' / {round(size, 1)} {unit}', ' ', Bar(marker='#'), ' ', ETA(), ' | ', FileTransferSpeed(), '\033[00m'], max_value=remotefilesize, redirect_stdout=True, max_error=False)
-//         pbar.start()
-
-//         if resumedl:
-//             logger(f'Resuming    {str(fileIndex).zfill(len(str(totalDownloadCount)))}/{totalDownloadCount}: {wantedfile["name"]}', 'cyan', rewrite=True)
-//             pbar += localfilesize
-//             headers = {'Range': f'bytes={localfilesize}-'}
-//             resp = start_stream(wantedfile, headers)
-//             for data in resp.iter_content(chunk_size=CHUNKSIZE):
-//                 file.write(data)
-//                 pbar += len(data)
-//         else:
-//             logger(f'Downloading {str(fileIndex).zfill(len(str(totalDownloadCount)))}/{totalDownloadCount}: {wantedfile["name"]}', 'cyan', rewrite=True)
-//             for data in resp.iter_content(chunk_size=CHUNKSIZE):
-//                 file.write(data)
-//                 pbar += len(data)
-
-//         file.close()
-//         pbar.finish()
-//         print('\033[1A', end='\x1b[2K')
-//         logger(f'Downloaded  {str(fileIndex).zfill(len(str(totalDownloadCount)))}/{totalDownloadCount}: {wantedfile["name"]}', 'green', True)
-//     else:
-//         logger(f'Already DLd {str(fileIndex).zfill(len(str(totalDownloadCount)))}/{totalDownloadCount}: {wantedfile["name"]}', 'green', True)
-
 pub fn download_rom(
     output_path: &String,
     rom_url: &String,
     rom: &Rom,
     file_index: &usize,
     total_download_count: &usize,
-) {
+) -> Result<File, reqwest::Error> {
     let local_path = Path::new(output_path).join(&rom.file);
 
     let mut resume_dl = false;
     let mut proceed_dl = true;
 
-    println!(
-        "Checking    {}/{}: {}",
-        file_index, total_download_count, rom.name
-    );
-
     let url = format!("{}{}", constants::MYRIENT_HTTP_ADDR, rom_url);
-    let mut headers = constants::REQ_HEADERS.clone();
-    let resp = HTTP_CLIENT
-        .get(url.clone())
-        .headers(headers.clone())
-        .send()
-        .unwrap();
+    let head = HTTP_CLIENT
+        .head(url.clone())
+        .headers(constants::REQ_HEADERS.clone())
+        .send()?;
 
-    let remote_file_size = resp.content_length().unwrap();
+    let remote_file_size = head
+        .headers()
+        .get(header::CONTENT_LENGTH)
+        .and_then(|ct_len| ct_len.to_str().ok())
+        .and_then(|ct_len| ct_len.parse().ok())
+        .unwrap_or(0);
 
     let local_file_size = if local_path.exists() {
-        Path::new(&local_path).metadata().unwrap().len()
+        local_path.metadata().unwrap().len() - 1
     } else {
         0
     };
@@ -267,69 +226,66 @@ pub fn download_rom(
     }
 
     if proceed_dl {
-        let file = std::fs::OpenOptions::new()
+        let mut request = HTTP_CLIENT
+            .get(url.clone())
+            .headers(constants::REQ_HEADERS.clone());
+
+        let progress_bar = ProgressBar::new(remote_file_size);
+        progress_bar.set_style(ProgressStyle::with_template(
+            "{prefix:.cyan} {percent:>2}% | {bytes:>10} / {total_bytes} | {bar} | ETA: {eta:>3} | {bytes_per_sec:>12}",
+        ).unwrap().progress_chars("=> "));
+
+        
+        let mut download_verb: &str = "Downloading";
+        
+        if resume_dl {
+            download_verb = "Resuming";
+            
+            progress_bar.set_position(local_file_size);
+            
+            request = request.header(header::RANGE, &format!("bytes={}-", local_file_size));
+        }
+        
+        progress_bar.set_prefix(format!(
+            "{} {}/{}: {}",
+            download_verb, file_index, total_download_count, rom.name
+        ));
+
+        let mut reader = DownloadProgress {
+            inner: request.send()?,
+            progress_bar,
+        };
+
+        let mut writer: std::fs::File = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
             .open(&local_path)
             .unwrap();
 
-        let mut writer = io::BufWriter::new(file);
+        let _ = io::copy(&mut reader, &mut writer);
 
-        let size = remote_file_size as f32 / 1024.0;
-        let unit = "KB";
-        let pbar = ProgressBar::new(remote_file_size as u64);
+        reader.progress_bar.finish_and_clear();
 
-        let style = ProgressStyle::default_bar()
-            .template("{prefix:.cyan} {wide_bar} {pos}/{len} {per_sec} {eta}");
-
-        if style.is_err() {
-            println!("{}", style.err().unwrap());
-        } else {
-            pbar.set_style(style.unwrap().progress_chars("=> "));
-        }
-        pbar.set_prefix(format!(
-            "Downloading {}/{}: {} / {:.1} {}",
-            file_index, total_download_count, rom.name, size, unit
-        ));
-
-        if resume_dl {
-            println!(
-                "Resuming    {}/{}: {}",
+        println!(
+            "{}",
+            format!(
+                "Downloaded  {}/{}: {}",
                 file_index, total_download_count, rom.name
-            );
-        } else {
-            println!(
-                "Downloading {}/{}: {}",
-                file_index, total_download_count, rom.name
-            );
-        }
+            )
+            .green()
+        );
 
-        let mut start = local_file_size;
-        pbar.set_position(start);
-        while start < remote_file_size {
-            let end = (start + constants::CHUNK_SIZE).min(remote_file_size);
-            headers.insert(
-                header::RANGE,
-                header::HeaderValue::from_str(&format!("bytes={}-{}", start, end - 1)).unwrap(),
-            );
-
-            let resp = HTTP_CLIENT
-                .get(url.clone())
-                .headers(headers.clone())
-                .send()
-                .unwrap();
-
-            let data = resp.bytes().unwrap();
-
-            writer.write_all(data.as_ref()).unwrap();
-            pbar.inc(data.len() as u64);
-
-            start = end;
-        }
+        return Ok(writer);
     } else {
         println!(
-            "Already DLd {}/{}: {}",
-            file_index, total_download_count, rom.name
+            "{}",
+            format!(
+                "Already DLd {}/{}: {}",
+                file_index, total_download_count, rom.name
+            )
+            .green()
         );
     }
+
+    Ok(File::open(local_path).unwrap())
 }

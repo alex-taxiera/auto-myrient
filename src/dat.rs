@@ -78,23 +78,15 @@ pub fn get_header_data(dat: &Document) -> (Option<String>, Option<String>) {
 
             match catalog_name {
                 None => {
-                    println!(
-                        "{} {}{}",
-                        "Processing".green(),
-                        system.green(),
-                        "...".green()
-                    );
+                    println!("{}", format!("Processing {}...", system.green()).green());
 
                     return (Some(system), None);
                 }
                 Some(catalog_name) => {
                     println!(
-                        "{} {}{} {}{}",
-                        "Processing".green(),
-                        catalog_name.green(),
-                        ":".green(),
-                        system.green(),
-                        "...".green()
+                        "{}",
+                        format!("Processing {}: {}...", catalog_name.green(), system.green(),)
+                            .green()
                     );
 
                     return (Some(system), Some(catalog_name.to_string()));

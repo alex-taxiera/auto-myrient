@@ -16,9 +16,6 @@ pub static CATALOG_URLS: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
 // Postfixes in DATs to strip away
 pub static DAT_POSTFIXES: Lazy<Vec<&str>> = Lazy::new(|| vec![" (Retool)"]);
 
-// Chunk sizes to download
-pub static CHUNK_SIZE: u64 = 128 * 1024 * 1024;
-
 // Headers to use in HTTP-requests
 pub static REQ_HEADERS: Lazy<header::HeaderMap> = Lazy::new(|| {
     let mut headers = header::HeaderMap::new();

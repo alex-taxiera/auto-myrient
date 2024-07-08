@@ -47,7 +47,7 @@ fn main() {
         output_dir = output_dir[..output_dir.len() - 1].to_string();
     }
 
-    println!("{} {}", "Output directory:".green(), output_dir.green());
+    println!("{}", format!("Output directory: {}", output_dir).green());
 
     println!("{}", "Opening input DAT-file...".green());
     let dat_file_res = std::fs::read_to_string(&args.input);
@@ -96,27 +96,36 @@ fn main() {
     let missing_roms_len = missing_roms.len();
 
     println!(
-        "{} {}",
-        "Amount of wanted ROMs in DAT-file   :".green(),
-        wanted_roms.len().to_string().green()
+        "{}",
+        format!(
+            "Amount of wanted ROMs in DAT-file   : {}",
+            wanted_roms.len().to_string()
+        )
+        .green()
     );
     println!(
-        "{} {}",
-        "Amount of found ROMs at server      :".green(),
-        available_roms.len().to_string().green()
+        "{}",
+        format!(
+            "Amount of found ROMs at server      : {}",
+            available_roms.len().to_string()
+        )
+        .green()
     );
     if missing_roms_len > 0 {
         println!(
-            "{} {}",
-            "Amount of missing ROMs at server    :".yellow(),
-            missing_roms_len.to_string().yellow()
+            "{}",
+            format!(
+                "Amount of missing ROMs at server    : {}",
+                missing_roms_len.to_string()
+            )
+            .yellow()
         );
     }
 
     if !args.list {
         for index in 0..wanted_roms.len() {
             let wanted_rom = wanted_roms.get(index).unwrap();
-            let rom_res = myrient::download_rom(
+            let file = myrient::download_rom(
                 &output_dir,
                 &format!("{}{}{}", &catalog_url, &collection_url, wanted_rom.url),
                 &wanted_rom,
@@ -124,9 +133,9 @@ fn main() {
                 &wanted_roms.len(),
             );
 
-            // if rom_res.is_err() {
-            //     println!("{}", rom_res.unwrap_err().red());
-            // }
+            if file.is_err() {
+                println!("{}", file.unwrap_err().to_string().red());
+            }
         }
 
         println!("{}", "Downloading complete!".green());
@@ -134,10 +143,9 @@ fn main() {
 
     if missing_roms_len > 0 {
         println!(
-            "{} {}",
-            "Following".red(),
+            "{}",
             format!(
-                "{} ROMs in DAT not automatically found from server, grab these manually:",
+                "Following {} ROMs in DAT not automatically found from server, grab these manually:",
                 missing_roms_len
             )
             .red()
@@ -190,10 +198,13 @@ fn get_catalog_url(catalog_name: &String, select_catalog: &bool) -> String {
 
         for index in 0..catalogs.len() {
             println!(
-                "{}{} {}",
-                (index + 1).to_string().cyan(),
-                ":".cyan(),
-                catalogs.get(index).unwrap().title.cyan()
+                "{}",
+                format!(
+                    "{}: {}",
+                    (index + 1).to_string(),
+                    catalogs.get(index).unwrap().title
+                )
+                .cyan()
             );
         }
 
@@ -259,19 +270,25 @@ fn get_collection_url(catalog_url: &String, system_name: &String, select_system:
         if use_matches {
             for index in 0..matching_collections.len() {
                 println!(
-                    "{}{} {}",
-                    (index + 1).to_string().cyan(),
-                    ":".cyan(),
-                    matching_collections.get(index).unwrap().title.cyan()
+                    "{}",
+                    format!(
+                        "{}: {}",
+                        (index + 1).to_string(),
+                        matching_collections.get(index).unwrap().title
+                    )
+                    .yellow()
                 );
             }
         } else {
             for index in 0..collections_len {
                 println!(
-                    "{}{} {}",
-                    (index + 1).to_string().cyan(),
-                    ":".cyan(),
-                    collections.get(index).unwrap().title.cyan()
+                    "{}",
+                    format!(
+                        "{}: {}",
+                        (index + 1).to_string(),
+                        collections.get(index).unwrap().title
+                    )
+                    .cyan()
                 );
             }
         }

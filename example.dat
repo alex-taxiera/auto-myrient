@@ -10,9 +10,20 @@
 		<homepage>redump.org</homepage>
 		<url>http://redump.org/</url>
 	</header>
+	<game name="Champions of Norrath (USA)">
+		<category>Games</category>
+		<description>Champions of Norrath (USA)</description>
+		<rom name="Champions of Norrath (USA).iso" size="8319303680" crc="21cf5560" md5="35c9feb77a5d0927286938c83ff71a3d" sha1="f0b5ca74e7d54915304431f0b2b7dce58ea70a0d"/>
+	</game>
 	<game name="DreamWorks &amp; Aardman Flushed Away (USA)">
 		<category>Games</category>
 		<description>DreamWorks &amp; Aardman Flushed Away (USA)</description>
 		<rom name="DreamWorks &amp; Aardman Flushed Away (USA).iso" size="1806008320" crc="94269d68" md5="593b8aaeb1d6bc97fcdf4bd244b75393" sha1="4d4c1da46b6788f01b8e63aa65f2c5802e4fc59d"/>
+	</game>
+	<game name="3D Mahjong + Janpai Tori (Japan)">
+		<category>Games</category>
+		<description>3D Mahjong + Janpai Tori (Japan)</description>
+		<rom name="3D Mahjong + Janpai Tori (Japan).cue" size="98" crc="73e69918" md5="f06b5686d73cf6aa9bbb6e45c7f650ad" sha1="44aafbfc26352c9376c99536bbb76aa24149c486"/>
+		<rom name="3D Mahjong + Janpai Tori (Japan).bin" size="66046512" crc="bf3c2802" md5="128c8675667131201ea00a7bb1ceed86" sha1="50aa4d752f512a9840004a18e36958c99669b4db"/>
 	</game>
 </datafile>
