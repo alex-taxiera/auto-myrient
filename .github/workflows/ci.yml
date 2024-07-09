@@ -55,13 +55,13 @@ jobs:
           os: macOS-latest
           target: x86_64-apple-darwin
           bin: auto-myrient
-          name: auto-myrient-Darwin-x86_64.tar.gz
+          name: auto-myrient-macOS-x86_64.tar.gz
 
         - release_for: macOS-aarch64
           os: macOS-latest
           target: aarch64-apple-darwin
           bin: auto-myrient
-          name: auto-myrient-Darwin-aarch64.tar.gz
+          name: auto-myrient-macOS-aarch64.tar.gz
 
     steps:
       - uses: actions/checkout@v4
