@@ -24,44 +24,44 @@ jobs:
         - release_for: Linux-x86_64
           os: ubuntu-latest
           target: x86_64-unknown-linux-musl
-          bin: oci-tester
-          name: oci-tester-Linux-x86_64-musl.tar.gz
+          bin: auto-myrient
+          name: auto-myrient-Linux-x86_64-musl.tar.gz
 
         - release_for: Linux-aarch64
           os: ubuntu-latest
           target: aarch64-unknown-linux-musl
-          bin: oci-tester
-          name: oci-tester-Linux-aarch64-musl.tar.gz
+          bin: auto-myrient
+          name: auto-myrient-Linux-aarch64-musl.tar.gz
 
         - release_for: Linux-arm
           os: ubuntu-latest
           target: arm-unknown-linux-musleabi
-          bin: oci-tester
-          name: oci-tester-Linux-arm-musl.tar.gz
+          bin: auto-myrient
+          name: auto-myrient-Linux-arm-musl.tar.gz
 
         - release_for: Windows-i686
           os: windows-latest
           target: i686-pc-windows-msvc
-          bin: oci-tester.exe
-          name: oci-tester-Windows-i686.zip
+          bin: auto-myrient.exe
+          name: auto-myrient-Windows-i686.zip
 
         - release_for: Windows-x86_64
           os: windows-latest
           target: x86_64-pc-windows-msvc
-          bin: oci-tester.exe
-          name: oci-tester-Windows-x86_64.zip
+          bin: auto-myrient.exe
+          name: auto-myrient-Windows-x86_64.zip
 
         - release_for: macOS-x86_64
           os: macOS-latest
           target: x86_64-apple-darwin
-          bin: oci-tester
-          name: oci-tester-Darwin-x86_64.tar.gz
+          bin: auto-myrient
+          name: auto-myrient-Darwin-x86_64.tar.gz
 
         - release_for: macOS-aarch64
           os: macOS-latest
           target: aarch64-apple-darwin
-          bin: oci-tester
-          name: oci-tester-Darwin-aarch64.tar.gz
+          bin: auto-myrient
+          name: auto-myrient-Darwin-aarch64.tar.gz
 
     steps:
       - uses: actions/checkout@v4
