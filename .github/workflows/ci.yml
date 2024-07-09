@@ -107,9 +107,10 @@ jobs:
         if: github.ref == 'refs/tags/test-release' || startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
 
   release:
+    name: Release
     needs: build
     if: startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
-    name: Release
+    runs-on: ubuntu-latest
 
     steps:
       - name: Download artifacts
