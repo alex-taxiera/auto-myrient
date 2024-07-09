@@ -107,7 +107,7 @@ jobs:
       - name: Publish release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: auto-myrient-${{ matrix.platform.os_name }}
+          name: ${{ matrix.platform.name }}
           path: "auto-myrient-*"
         if: github.ref == 'refs/heads/test-release' || startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
 
