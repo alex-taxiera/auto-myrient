@@ -121,7 +121,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: auto-myrient-*
+          pattern: auto-myrient-*
+          merge-multiple: true
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
