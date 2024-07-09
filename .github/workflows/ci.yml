@@ -71,7 +71,7 @@ jobs:
 
       - name: Install musl-tools on Linux
         run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
-        if: contains(matrix.platform.name, 'musl')
+        if: contains(matrix.platform.target, 'musl')
 
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
@@ -80,21 +80,6 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--locked --release"
           strip: true
-
-      - name: Package as archive
-        shell: bash
-        run: |
-          cd target/${{ matrix.platform.target }}/release
-          if [[ "${{ matrix.platform.os }}" == "windows-latest" ]]; then
-            7z a ../../../${{ matrix.platform.name }} ${{ matrix.platform.bin }}
-          else
-            tar czvf ../../../${{ matrix.platform.name }} ${{ matrix.platform.bin }}
-          fi
-          cd -
-        if: |
-          ( startsWith( github.ref, 'refs/tags/v' ) ||
-            startsWith( github.ref, 'refs/tags/rc' ) ||
-            github.ref == 'refs/heads/test-release' )
 
       - name: Generate SHA-256
         run: shasum -a 256 ${{ matrix.platform.name }}
