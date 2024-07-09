@@ -69,6 +69,10 @@ jobs:
       - name: Cache cargo & target directories
         uses: Swatinem/rust-cache@v2
 
+      - name: Install musl-tools on Linux
+        run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
+        if: contains(matrix.platform.name, 'musl')
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
         with:
