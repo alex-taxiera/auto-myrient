@@ -128,4 +128,4 @@ jobs:
         with:
           draft: true
           files: "auto-myrient-*"
-          body_path: CHANGELOG.md
+          body_path: ${{ github.workspace }}/CHANGELOG.md
