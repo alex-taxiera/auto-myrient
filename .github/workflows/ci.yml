@@ -1,4 +1,4 @@
-name: Tests and release
+name: Build and Release
 
 on:
   push:
@@ -14,38 +14,47 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  test:
-    name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
+  build:
+    name: Release - ${{ matrix.platform.release_for }}
     runs-on: ${{ matrix.platform.os }}
     strategy:
-      fail-fast: false
       matrix:
-        platform:
-          - os_name: Linux-powerpc64
+       platform:
+          - release_for: FreeBSD-x86_64
             os: ubuntu-20.04
-            target: powerpc64-unknown-linux-gnu
+            target: x86_64-unknown-freebsd
             bin: auto-myrient
-            name: auto-myrient-Linux-powerpc64-gnu.tar.gz
-        toolchain:
-          - stable
-          - beta
-          - nightly
+            name: auto-myrient-FreeBSD-x86_64.tar.gz
+            command: build
+
+          - release_for: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: auto-myrient.exe
+            name: auto-myrient-Windows-x86_64.zip
+            command: build
+
+          - release_for: macOS-x86_64
+            os: macOS-latest
+            target: x86_64-apple-darwin
+            bin: auto-myrient
+            name: auto-myrient-Darwin-x86_64.tar.gz
+            command: build
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache cargo & target directories
         uses: Swatinem/rust-cache@v2
-      - name: Configure Git
-        run: |
-          git config --global user.email "jdoe@example.com"
-          git config --global user.name "J. Doe"
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
         with:
-          command: "build"
+          command: ${{ matrix.platform.command }}
           target: ${{ matrix.platform.target }}
-          toolchain: ${{ matrix.toolchain }}
           args: "--locked --release"
           strip: true
+
       - name: Package as archive
         shell: bash
         run: |
@@ -57,28 +66,23 @@ jobs:
           fi
           cd -
         if: |
-          matrix.toolchain == 'stable' &&
           ( startsWith( github.ref, 'refs/tags/v' ) ||
             startsWith( github.ref, 'refs/tags/rc' ) ||
             github.ref == 'refs/tags/test-release' )
-      - name: Publish release artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: auto-myrient-${{ matrix.platform.os_name }}
-          path: "auto-myrient-*"
-        if: matrix.toolchain == 'stable' && github.ref == 'refs/tags/test-release'
+
       - name: Generate SHA-256
         run: shasum -a 256 ${{ matrix.platform.name }}
         if: |
-          matrix.toolchain == 'stable' &&
           matrix.platform.os == 'macOS-latest' &&
           ( startsWith( github.ref, 'refs/tags/v' ) ||
             startsWith( github.ref, 'refs/tags/rc' ) ||
             github.ref == 'refs/tags/test-release' )
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: "auto-myrient-*"
           body_path: CHANGELOG.md
-        if: matrix.toolchain == 'stable' && (startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' ))
+        if: startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
+
