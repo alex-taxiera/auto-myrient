@@ -110,6 +110,8 @@ jobs:
     needs: build
     if: startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
     name: Release
+
+    steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
