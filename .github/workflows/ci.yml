@@ -90,7 +90,7 @@ jobs:
         if: |
           ( startsWith( github.ref, 'refs/tags/v' ) ||
             startsWith( github.ref, 'refs/tags/rc' ) ||
-            github.ref == 'refs/tags/test-release' )
+            github.ref == 'refs/heads/test-release' )
 
       - name: Generate SHA-256
         run: shasum -a 256 ${{ matrix.platform.name }}
@@ -98,14 +98,14 @@ jobs:
           matrix.platform.os == 'macOS-latest' &&
           ( startsWith( github.ref, 'refs/tags/v' ) ||
             startsWith( github.ref, 'refs/tags/rc' ) ||
-            github.ref == 'refs/tags/test-release' )
+            github.ref == 'refs/heads/test-release' )
 
       - name: Publish release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: auto-myrient-${{ matrix.platform.os_name }}
           path: "auto-myrient-*"
-        if: github.ref == 'refs/tags/test-release' || startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
+        if: github.ref == 'refs/heads/test-release' || startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
 
   release:
     name: Release
