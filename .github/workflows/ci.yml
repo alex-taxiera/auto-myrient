@@ -111,10 +111,10 @@ jobs:
           path: "auto-myrient-*"
         if: github.ref == 'refs/heads/test-release' || startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
 
-  release:
-    name: Release
+  prerelease:
+    name: Prerelease
     needs: build
-    if: startsWith( github.ref, 'refs/tags/v' ) || startsWith( github.ref, 'refs/tags/rc' )
+    if: startsWith( github.ref, 'refs/tags/rc' )
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -127,11 +127,39 @@ jobs:
         with:
           pattern: auto-myrient-*
           merge-multiple: true
-      - name: Publish GitHub release
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          files: "auto-myrient-*"
+          body: "[Changelog](CHANGELOG.md#unreleased)"
+
+  release:
+    name: Release
+    needs: build
+    if: startsWith( github.ref, 'refs/tags/v' )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: auto-myrient-*
+          merge-multiple: true
+
+      - name: Set tag link
+        id: gen_link
+        run: |
+          echo "TAG_LINK=v1.1.1" | tr -d . >> $GITHUB_OUTPUT
+
+      - name: Publish
         uses: softprops/action-gh-release@v2
         with:
           make_latest: true
-          prerelease: ${{ startsWith( github.ref, 'refs/tags/rc' ) }}
           files: "auto-myrient-*"
-          body_path: ${{ github.workspace }}/CHANGELOG.md
-          body: "Refer to CHANGELOG.md for details."
+          body: "[Changelog](CHANGELOG.md#${{ steps.gen_version.outputs.TAG_LINK }})"
