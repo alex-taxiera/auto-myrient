@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use std::fs::File;
 use std::io::{self, Read};
 use std::path::Path;
@@ -9,12 +10,16 @@ use once_cell::sync::Lazy;
 use reqwest::blocking::Client;
 
 use reqwest::header;
+use retry::delay::Exponential;
+use retry::retry;
 use select::document::Document;
 use select::predicate::{Attr, Name, Predicate};
 
 use crate::constants;
 
 const HTTP_CLIENT: Lazy<Client> = Lazy::new(|| Client::new());
+
+const MAX_RETRIES: usize = 3;
 
 const PROGRESS_PERCENT_PART: &str = "percent:>2";
 const PROGESS_TEMPLATE: &str =
@@ -29,7 +34,7 @@ pub struct Collection {
     pub title: String,
     pub url: String,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Rom {
     pub name: String,
     pub file: String,
@@ -73,7 +78,7 @@ impl<R: Read> Read for DownloadProgress<R> {
         self.inner.read(buf).map(|n| {
             self.progress_bar.set_style(
                 ProgressStyle::with_template(build_progress_template(&self.progress_bar).as_str())
-                .unwrap(),
+                    .unwrap(),
             );
             self.progress_bar.inc(n as u64);
             n
@@ -331,4 +336,55 @@ pub fn download_rom(
     }
 
     Ok(File::open(local_path).unwrap())
+}
+
+// custom error type that includes a vector of the failed Rom objects
+#[derive(Debug, Clone)]
+pub struct BulkDownloadError {
+    pub failed_roms: Vec<Rom>,
+}
+
+impl fmt::Display for BulkDownloadError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Failed to download the following ROMs: ")?;
+        for rom in &self.failed_roms {
+            write!(f, "{} ", rom.name)?;
+        }
+        Ok(())
+    }
+}
+
+pub fn download_roms(
+    roms: &Vec<Rom>,
+    output_dir: &String,
+    catalog_url: &String,
+    collection_url: &String,
+) -> Result<(), BulkDownloadError> {
+    let mut roms_with_errors: Vec<Rom> = Vec::new();
+
+    for index in 0..roms.len() {
+        let rom = roms.get(index).unwrap();
+        let result = retry(Exponential::from_millis(100).take(MAX_RETRIES), || {
+            download_rom(
+                output_dir,
+                &format!("{}{}{}", catalog_url, collection_url, rom.url),
+                rom,
+                &(index + 1),
+                &roms.len(),
+            )
+        });
+
+        if result.is_err() {
+            println!("{}", format!("Error with  {}", rom.name).red());
+            roms_with_errors.push(rom.clone());
+        }
+    }
+
+    if roms_with_errors.len() > 0 {
+        return Err(BulkDownloadError {
+            failed_roms: roms_with_errors,
+        });
+    }
+
+    Ok(())
 }

@@ -122,35 +122,25 @@ fn main() {
         );
     }
 
-    let mut roms_with_errors: Vec<myrient::Rom> = Vec::new();
-
-    let download = |roms: Vec<myrient::Rom>, on_error: &mut dyn FnMut(myrient::Rom)| {
-        download_roms(roms, &output_dir, &catalog_url, &collection_url, on_error);
-    };
-
     if !args.list {
-        download(wanted_roms, &mut |rom| {
-            println!("{}", format!("Error with  {}", rom.name).red());
-            roms_with_errors.push(rom);
-        });
-
-        let mut final_roms_with_errors: Vec<myrient::Rom> = Vec::new();
-
-        if roms_with_errors.len() > 0 {
-            println!("{}", "Retrying failed downloads...".yellow());
-            download(roms_with_errors, &mut |rom| {
-                println!("{}", format!("Error with  {}", rom.name).red());
-                final_roms_with_errors.push(rom);
-            });
-        }
-
-        if final_roms_with_errors.len() > 0 {
-            println!("{}", "Failed downloads:".red());
-            for rom in final_roms_with_errors.iter() {
-                println!("{}", rom.name);
+        match myrient::download_roms(&wanted_roms, &output_dir, &catalog_url, &collection_url) {
+            Ok(_) => {
+                println!("{}", "All downloads successful!".green());
             }
-        } else {
-            println!("{}", "All downloads successful!".green());
+            Err(err) => {
+                println!(
+                    "{}",
+                    format!(
+                        "Following {} ROMs failed to download:",
+                        err.failed_roms.len()
+                    )
+                    .red()
+                );
+
+                for rom in err.failed_roms {
+                    println!("{}", rom.name.red());
+                }
+            }
         }
     }
 
@@ -335,30 +325,4 @@ fn get_collection_url(catalog_url: &String, system_name: &String, select_system:
     }
 
     collection_url.unwrap()
-}
-
-fn download_roms<F>(
-    roms: Vec<myrient::Rom>,
-    output_dir: &String,
-    catalog_url: &String,
-    collection_url: &String,
-    mut on_error: F,
-) where
-    F: FnMut(myrient::Rom),
-{
-    for index in 0..roms.len() {
-        let rom = roms.get(index).unwrap();
-        let file = myrient::download_rom(
-            output_dir,
-            &format!("{}{}{}", &catalog_url, &collection_url, rom.url),
-            &rom,
-            &(index + 1),
-            &roms.len(),
-        );
-
-        if file.is_err() {
-            println!("{}", format!("Error with  {}", rom.name).red());
-            on_error(rom.clone());
-        }
-    }
 }
