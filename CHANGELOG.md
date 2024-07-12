@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Retry logic for failed downloads
 
+### Changed
+- Split progress bar into two lines
+- Colorized progress percentage
+- Switched to decimal bytes (MB instead of MiB)
+
 ## [v0.1.0] - 2024-07-11
 
 ### Added

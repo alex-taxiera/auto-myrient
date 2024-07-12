@@ -3,8 +3,8 @@ use std::fs::File;
 use std::io::{self, Read};
 use std::path::Path;
 
-use colored::Colorize;
-use indicatif::{ProgressBar, ProgressStyle};
+use colored::{Colorize, CustomColor};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 use reqwest::blocking::Client;
 
@@ -15,6 +15,10 @@ use select::predicate::{Attr, Name, Predicate};
 use crate::constants;
 
 const HTTP_CLIENT: Lazy<Client> = Lazy::new(|| Client::new());
+
+const PROGRESS_PERCENT_PART: &str = "percent:>2";
+const PROGESS_TEMPLATE: &str =
+    " | {decimal_bytes:>9} / {decimal_total_bytes} | {bar} | ETA: {eta:>3} | {decimal_bytes_per_sec:>11}";
 
 pub struct Catalog {
     pub title: String,
@@ -36,9 +40,41 @@ struct DownloadProgress<R> {
     progress_bar: ProgressBar,
 }
 
+fn get_color_for_percentage(percent: f64) -> CustomColor {
+    match percent {
+        0.0..=0.1 => CustomColor::new(255, 0, 0),
+        0.1..=0.2 => CustomColor::new(255, 51, 0),
+        0.2..=0.3 => CustomColor::new(255, 102, 0),
+        0.3..=0.4 => CustomColor::new(255, 153, 0),
+        0.4..=0.5 => CustomColor::new(255, 204, 0),
+        0.5..=0.6 => CustomColor::new(255, 255, 0),
+        0.6..=0.7 => CustomColor::new(204, 255, 0),
+        0.7..=0.8 => CustomColor::new(153, 255, 0),
+        0.8..=0.9 => CustomColor::new(102, 255, 0),
+        0.9..=0.99 => CustomColor::new(51, 255, 0),
+        _ => CustomColor::new(0, 255, 0),
+    }
+}
+
+fn build_progress_template(progress_bar: &ProgressBar) -> String {
+    let percent = progress_bar.position() as f64 / progress_bar.length().unwrap() as f64;
+
+    let color = get_color_for_percentage(percent);
+
+    format!(
+        "{}{}",
+        format!("{{{}}}%", PROGRESS_PERCENT_PART).custom_color(color),
+        format!("{}", PROGESS_TEMPLATE),
+    )
+}
+
 impl<R: Read> Read for DownloadProgress<R> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.inner.read(buf).map(|n| {
+            self.progress_bar.set_style(
+                ProgressStyle::with_template(build_progress_template(&self.progress_bar).as_str())
+                .unwrap(),
+            );
             self.progress_bar.inc(n as u64);
             n
         })
@@ -230,23 +266,29 @@ pub fn download_rom(
             .get(url.clone())
             .headers(constants::REQ_HEADERS.clone());
 
-        let progress_bar = ProgressBar::new(remote_file_size);
-        progress_bar.set_style(ProgressStyle::with_template(
-            "{prefix:.cyan} {percent:>2}% | {bytes:>10} / {total_bytes} | {bar} | ETA: {eta:>3} | {bytes_per_sec:>12}",
-        ).unwrap().progress_chars("=> "));
+        let multi_progress = MultiProgress::new();
 
-        
+        let title_bar = multi_progress.add(ProgressBar::new(0));
+        let progress_bar = multi_progress.add(ProgressBar::new(remote_file_size));
+
         let mut download_verb: &str = "Downloading";
-        
+
         if resume_dl {
             download_verb = "Resuming";
-            
+
             progress_bar.set_position(local_file_size);
-            
+
             request = request.header(header::RANGE, &format!("bytes={}-", local_file_size));
         }
-        
-        progress_bar.set_prefix(format!(
+
+        title_bar.set_style(ProgressStyle::with_template("{prefix:.cyan}").unwrap());
+        progress_bar.set_style(
+            ProgressStyle::with_template(build_progress_template(&progress_bar).as_str())
+                .unwrap()
+                .progress_chars("=> "),
+        );
+
+        title_bar.set_prefix(format!(
             "{} {}/{}: {}",
             download_verb, file_index, total_download_count, rom.name
         ));
@@ -265,6 +307,7 @@ pub fn download_rom(
         let _ = io::copy(&mut reader, &mut writer);
 
         reader.progress_bar.finish_and_clear();
+        title_bar.finish_and_clear();
 
         println!(
             "{}",
