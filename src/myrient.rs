@@ -21,7 +21,7 @@ const HTTP_CLIENT: Lazy<Client> = Lazy::new(|| Client::new());
 
 const MAX_RETRIES: usize = 3;
 
-const PROGRESS_PERCENT_PART: &str = "percent:>2";
+const PROGRESS_PERCENT_PART: &str = "percent:>3";
 const PROGESS_TEMPLATE: &str =
     " | {decimal_bytes:>9} / {decimal_total_bytes} | {bar} | ETA: {eta:>3} | {decimal_bytes_per_sec:>11}";
 
@@ -279,7 +279,7 @@ pub fn download_rom(
         let mut download_verb: &str = "Downloading";
 
         if resume_dl {
-            download_verb = "Resuming";
+            download_verb = "Resuming   ";
 
             progress_bar.set_position(local_file_size);
 
@@ -293,9 +293,19 @@ pub fn download_rom(
                 .progress_chars("=> "),
         );
 
+        let width = total_download_count
+            .checked_ilog10()
+            .unwrap_or(0)
+            .try_into()
+            .unwrap_or(0)
+            + 1;
+
         title_bar.set_prefix(format!(
-            "{} {}/{}: {}",
-            download_verb, file_index, total_download_count, rom.name
+            "{} {:width$}/{}: {}",
+            download_verb,
+            file_index,
+            total_download_count,
+            rom.name,
         ));
 
         let mut reader = DownloadProgress {
