@@ -61,8 +61,9 @@ fn get_color_for_percentage(percent: f64) -> CustomColor {
     }
 }
 
-fn build_progress_template(progress_bar: &ProgressBar) -> String {
-    let percent = progress_bar.position() as f64 / progress_bar.length().unwrap() as f64;
+fn build_progress_template(progress_bar: &ProgressBar, position: Option<f64>) -> String {
+    let percent =
+        position.unwrap_or(progress_bar.position() as f64) / progress_bar.length().unwrap() as f64;
 
     let color = get_color_for_percentage(percent);
 
@@ -77,8 +78,10 @@ impl<R: Read> Read for DownloadProgress<R> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.inner.read(buf).map(|n| {
             self.progress_bar.set_style(
-                ProgressStyle::with_template(build_progress_template(&self.progress_bar).as_str())
-                    .unwrap(),
+                ProgressStyle::with_template(
+                    build_progress_template(&self.progress_bar, None).as_str(),
+                )
+                .unwrap(),
             );
             self.progress_bar.inc(n as u64);
             n
@@ -276,21 +279,21 @@ pub fn download_rom(
         let title_bar = multi_progress.add(ProgressBar::new(0));
         let progress_bar = multi_progress.add(ProgressBar::new(remote_file_size));
 
-        let mut download_verb: &str = "Downloading";
-
-        if resume_dl {
-            download_verb = "Resuming   ";
-
-            progress_bar.set_position(local_file_size);
-
-            request = request.header(header::RANGE, &format!("bytes={}-", local_file_size));
-        }
-
         title_bar.set_style(ProgressStyle::with_template("{prefix:.cyan}").unwrap());
         progress_bar.set_style(
-            ProgressStyle::with_template(build_progress_template(&progress_bar).as_str())
-                .unwrap()
-                .progress_chars("=> "),
+            ProgressStyle::with_template(
+                build_progress_template(
+                    &progress_bar,
+                    if resume_dl {
+                        Some(local_file_size as f64)
+                    } else {
+                        None
+                    },
+                )
+                .as_str(),
+            )
+            .unwrap()
+            .progress_chars("=> "),
         );
 
         let width = total_download_count
@@ -301,12 +304,17 @@ pub fn download_rom(
             + 1;
 
         title_bar.set_prefix(format!(
-            "{} {:width$}/{}: {}",
-            download_verb,
+            "{:11} {:width$}/{}: {}",
+            if resume_dl { "Resuming" } else { "Downloading" },
             file_index,
             total_download_count,
             rom.name,
         ));
+
+        if resume_dl {
+            progress_bar.set_position(local_file_size);
+            request = request.header(header::RANGE, &format!("bytes={}-", local_file_size));
+        }
 
         let mut reader = DownloadProgress {
             inner: request.send()?,
