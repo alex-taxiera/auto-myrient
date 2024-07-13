@@ -61,7 +61,7 @@ fn get_color_for_percentage(percent: f64) -> CustomColor {
     }
 }
 
-fn build_progress_template(progress_bar: &ProgressBar, position: Option<f64>) -> String {
+fn build_progress_template(progress_bar: &ProgressBar, position: &Option<f64>) -> String {
     let percent =
         position.unwrap_or(progress_bar.position() as f64) / progress_bar.length().unwrap() as f64;
 
@@ -79,7 +79,7 @@ impl<R: Read> Read for DownloadProgress<R> {
         self.inner.read(buf).map(|n| {
             self.progress_bar.set_style(
                 ProgressStyle::with_template(
-                    build_progress_template(&self.progress_bar, None).as_str(),
+                    build_progress_template(&self.progress_bar, &None).as_str(),
                 )
                 .unwrap(),
             );
@@ -284,11 +284,7 @@ pub fn download_rom(
             ProgressStyle::with_template(
                 build_progress_template(
                     &progress_bar,
-                    if resume_dl {
-                        Some(local_file_size as f64)
-                    } else {
-                        None
-                    },
+                    &resume_dl.then_some(local_file_size as f64)
                 )
                 .as_str(),
             )
