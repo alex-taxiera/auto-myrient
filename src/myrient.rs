@@ -269,6 +269,8 @@ pub fn download_rom(
         resume_dl = true
     }
 
+    let width = total_download_count.checked_ilog10().unwrap_or(0) as usize + 1;
+
     if proceed_dl {
         let mut request = HTTP_CLIENT
             .get(url.clone())
@@ -284,17 +286,13 @@ pub fn download_rom(
             ProgressStyle::with_template(
                 build_progress_template(
                     &progress_bar,
-                    &resume_dl.then_some(local_file_size as f64)
+                    &resume_dl.then_some(local_file_size as f64),
                 )
                 .as_str(),
             )
             .unwrap()
             .progress_chars("=> "),
         );
-
-        let width = total_download_count
-            .checked_ilog10()
-            .unwrap_or(0) as usize + 1;
 
         title_bar.set_prefix(format!(
             "{:11} {:width$}/{}: {}",
@@ -328,7 +326,7 @@ pub fn download_rom(
         println!(
             "{}",
             format!(
-                "Downloaded  {}/{}: {}",
+                "Downloaded  {:width$}/{}: {}",
                 file_index, total_download_count, rom.name
             )
             .green()
@@ -339,7 +337,7 @@ pub fn download_rom(
         println!(
             "{}",
             format!(
-                "Already DLd {}/{}: {}",
+                "Already DLd {:width$}/{}: {}",
                 file_index, total_download_count, rom.name
             )
             .green()
