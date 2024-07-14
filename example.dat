@@ -10,20 +10,138 @@
 		<homepage>redump.org</homepage>
 		<url>http://redump.org/</url>
 	</header>
-	<game name="Champions of Norrath (USA)">
+	<game name="0 Story (Japan) (Disc 1)">
 		<category>Games</category>
-		<description>Champions of Norrath (USA)</description>
-		<rom name="Champions of Norrath (USA).iso" size="8319303680" crc="21cf5560" md5="35c9feb77a5d0927286938c83ff71a3d" sha1="f0b5ca74e7d54915304431f0b2b7dce58ea70a0d"/>
+		<description>0 Story (Japan) (Disc 1)</description>
+		<rom name="0 Story (Japan) (Disc 1).iso" size="4481286144" crc="1c6ed37f" md5="ac0aa78f60108da577581839d0a22011" sha1="9a7eb026febe8d7240c70cea31480e9150a625f1"/>
 	</game>
-	<game name="DreamWorks &amp; Aardman Flushed Away (USA)">
+	<game name="0 Story (Japan) (Disc 2)">
 		<category>Games</category>
-		<description>DreamWorks &amp; Aardman Flushed Away (USA)</description>
-		<rom name="DreamWorks &amp; Aardman Flushed Away (USA).iso" size="1806008320" crc="94269d68" md5="593b8aaeb1d6bc97fcdf4bd244b75393" sha1="4d4c1da46b6788f01b8e63aa65f2c5802e4fc59d"/>
+		<description>0 Story (Japan) (Disc 2)</description>
+		<rom name="0 Story (Japan) (Disc 2).iso" size="4505763840" crc="b0e35650" md5="5098d154d262b76257f20f80e6e1bf17" sha1="15771b24cef6ba204642c1dab5f92d5cd1e6a85e"/>
+	</game>
+	<game name="007 - Agent Under Fire (USA)">
+		<category>Games</category>
+		<description>007 - Agent Under Fire (USA)</description>
+		<rom name="007 - Agent Under Fire (USA).iso" size="1630306304" crc="26424399" md5="a94727213cf77a66bef7b6598e54b876" sha1="4aaa8cc1e16468ceae35089ce7e64a4fee9109f8"/>
+	</game>
+	<game name="007 - Everything or Nothing (USA)">
+		<category>Games</category>
+		<description>007 - Everything or Nothing (USA)</description>
+		<rom name="007 - Everything or Nothing (USA).iso" size="3489366016" crc="d7621bc4" md5="106dcb1524fb82c6030d78c11cd49b96" sha1="197276e0d7abc58dbe5b6d6f5fc9dc8c30f05697"/>
+	</game>
+	<game name="007 - From Russia with Love (USA)">
+		<category>Games</category>
+		<description>007 - From Russia with Love (USA)</description>
+		<rom name="007 - From Russia with Love (USA).iso" size="4617732096" crc="96109ebb" md5="f2f0a89f040635af46f99182231ddfd9" sha1="b2ea7a9361ccefabc6915e828d91d10ff21e9c9b"/>
+	</game>
+	<game name="007 - Nightfire (USA)">
+		<category>Games</category>
+		<description>007 - Nightfire (USA)</description>
+		<rom name="007 - Nightfire (USA).iso" size="2439315456" crc="848bacb6" md5="008302d82a305e9ad04e349f1f6982ee" sha1="03717059f97630e9ee2fd56dcf537c6fe3ed96d1"/>
+	</game>
+	<game name="007 - Quantum of Solace (USA)">
+		<category>Games</category>
+		<description>007 - Quantum of Solace (USA)</description>
+		<rom name="007 - Quantum of Solace (USA).iso" size="4677795840" crc="37972543" md5="ce030f48dcb588682902b5a569baa24e" sha1="f2bd9d89e512895c30390881838c8e966db4cdda"/>
+	</game>
+	<game name="10 Pin - Champions Alley (Europe) (En,Fr,De,Es,It,Nl)">
+		<category>Games</category>
+		<description>10 Pin - Champions Alley (Europe) (En,Fr,De,Es,It,Nl)</description>
+		<rom name="10 Pin - Champions Alley (Europe) (En,Fr,De,Es,It,Nl).cue" size="119" crc="1adfb9df" md5="bfbdfdc91a2491986d6180bf0b09c3b5" sha1="dfbe9d9f3dae6c83d57400145a673030dba6aae9"/>
+		<rom name="10 Pin - Champions Alley (Europe) (En,Fr,De,Es,It,Nl).bin" size="107862720" crc="aa3daca5" md5="cc0d969e2761e67d9c9fdf35125fd7f1" sha1="88d9e8375fb272714ae0fd690ce49617879b5da6"/>
+	</game>
+	<game name="10.000 Bullets (Europe) (En,Fr,De,Es,It)">
+		<category>Games</category>
+		<description>10.000 Bullets (Europe) (En,Fr,De,Es,It)</description>
+		<rom name="10.000 Bullets (Europe) (En,Fr,De,Es,It).iso" size="2237923328" crc="4cff395c" md5="ef34b45d286aefc08fb588d473ff0eb2" sha1="ef6d3c9563d0dca493e25de204cdcafe6f4c336d"/>
+	</game>
+	<game name="10th Anniversary Memorial Save Data (Japan) (Disc 2) (PlayStation 2 Taiou)">
+		<category>Applications</category>
+		<description>10th Anniversary Memorial Save Data (Japan) (Disc 2) (PlayStation 2 Taiou)</description>
+		<rom name="10th Anniversary Memorial Save Data (Japan) (Disc 2) (PlayStation 2 Taiou).cue" size="140" crc="ebf8b356" md5="65011c2436bb08174cfce33617cd2cb1" sha1="fb35a4531395548f10345a1bbafe94cbb806bb91"/>
+		<rom name="10th Anniversary Memorial Save Data (Japan) (Disc 2) (PlayStation 2 Taiou).bin" size="312623136" crc="9646dbc6" md5="066f5cd411d5b98e1d0aa1bc05ecc235" sha1="15d4919bbf7b4d8ffc9b6cdeb00e6ed8b95c0dac"/>
+	</game>
+	<game name="120 Yen no Haru - 120 Yen Stories (Japan)">
+		<category>Games</category>
+		<description>120 Yen no Haru - 120 Yen Stories (Japan)</description>
+		<rom name="120 Yen no Haru - 120 Yen Stories (Japan).iso" size="4593909760" crc="8274b668" md5="cce94fcf67c17dc4abc14de94a08b832" sha1="6ee106ec5ce8510debd80a57957d10ab3ce5642d"/>
+	</game>
+	<game name="12Riven - The Psi-Climinal of Integral (Japan)">
+		<category>Games</category>
+		<description>12Riven - The Psi-Climinal of Integral (Japan)</description>
+		<rom name="12Riven - The Psi-Climinal of Integral (Japan).iso" size="2824798208" crc="ef20de7b" md5="8286ac00ae0b400689293a679925f412" sha1="c36227c85e041af538a93ab35463b12ed7d1245e"/>
+	</game>
+	<game name="18 Wheeler - American Pro Trucker (USA)">
+		<category>Games</category>
+		<description>18 Wheeler - American Pro Trucker (USA)</description>
+		<rom name="18 Wheeler - American Pro Trucker (USA).cue" size="105" crc="83ae589a" md5="c5abe44c0b552a1a6ba54cfa18bf2e6f" sha1="5cb809181d960e8ce2c977273dfc2a70be664c97"/>
+		<rom name="18 Wheeler - American Pro Trucker (USA).bin" size="749866992" crc="af923475" md5="eea1e51b15b8ce43af264dec8ca19f36" sha1="10bcc9520c1eebd47f6a2304c17d738b0a421015"/>
+	</game>
+	<game name="187 - Ride or Die (USA) (En,Fr,Es)">
+		<category>Games</category>
+		<description>187 - Ride or Die (USA) (En,Fr,Es)</description>
+		<rom name="187 - Ride or Die (USA) (En,Fr,Es).iso" size="1582727168" crc="1e1874b1" md5="dfa4e0e69757dbb28eff6d70933e4e82" sha1="c56446531fdc4779b5a30510cc9edb0d8de0e758"/>
+	</game>
+	<game name="1945 I &amp; II (Europe) (En,Fr,De,Es,It)">
+		<category>Games</category>
+		<description>1945 I &amp; II (Europe) (En,Fr,De,Es,It)</description>
+		<rom name="1945 I &amp; II (Europe) (En,Fr,De,Es,It).cue" size="103" crc="e61396fd" md5="17afd44faf0ab26d86ebbef0ac810e7e" sha1="33c344b97014937b956b7c52c713f6f71272b16d"/>
+		<rom name="1945 I &amp; II (Europe) (En,Fr,De,Es,It).bin" size="190229760" crc="469807d0" md5="b7fec74bf5e52cd721dfa923fcd3f188" sha1="bdeeb21e7585fe09c5ef4db9bc24b975af46258f"/>
+	</game>
+	<game name="2002 FIFA World Cup (USA) (En,Es)">
+		<category>Games</category>
+		<description>2002 FIFA World Cup (USA) (En,Es)</description>
+		<rom name="2002 FIFA World Cup (USA) (En,Es).iso" size="3134062592" crc="9c44852d" md5="c331045e92c20e2a865525a8e22d92b6" sha1="0b34470f49a313f6fdb9f166a84456f8a60cc33f"/>
+	</game>
+	<game name="2003-nen Kaimaku - Ganbare Kyuukai-ou - Iwayuru Pro Yakyuu desu ne (Japan)">
+		<category>Games</category>
+		<description>2003-nen Kaimaku - Ganbare Kyuukai-ou - Iwayuru Pro Yakyuu desu ne (Japan)</description>
+		<rom name="2003-nen Kaimaku - Ganbare Kyuukai-ou - Iwayuru Pro Yakyuu desu ne (Japan).cue" size="140" crc="167debe7" md5="30c1357bb6ea61318c3073ad6542d215" sha1="0f597501f5d72c193af3464c5b548b0b8524219c"/>
+		<rom name="2003-nen Kaimaku - Ganbare Kyuukai-ou - Iwayuru Pro Yakyuu desu ne (Japan).bin" size="372378048" crc="391a87ec" md5="b88e257183b00df61b98609ac72857b9" sha1="a4b12b4f90c6b265b74cc39927635c74541922dd"/>
+	</game>
+	<game name="21 Card Games (Europe, Australia)">
+		<category>Games</category>
+		<description>21 Card Games (Europe, Australia)</description>
+		<rom name="21 Card Games (Europe, Australia).cue" size="99" crc="5d8814bf" md5="a64aa9eca664907fea7063a6c8c5454c" sha1="04f4595783188314bfadb0cc19ef3418137b9110"/>
+		<rom name="21 Card Games (Europe, Australia).bin" size="61149648" crc="b9f41c34" md5="ef5cf69b894e3412b4ccaa6b9c39d79f" sha1="e5912cd7d8d62f9f7ed3e762fecab9218ee8683b"/>
+	</game>
+	<game name="24 - The Game (USA) (En,Fr,Es)">
+		<category>Games</category>
+		<description>24 - The Game (USA) (En,Fr,Es)</description>
+		<rom name="24 - The Game (USA) (En,Fr,Es).iso" size="4562092032" crc="3938289a" md5="f60b2cdb21a40d06c2febdf2381b7891" sha1="e463d27ddad2df582036dfe048834acd3321a8cc"/>
+	</game>
+	<game name="25 to Life (USA)">
+		<category>Games</category>
+		<description>25 to Life (USA)</description>
+		<rom name="25 to Life (USA).iso" size="1903198208" crc="8bfc5c17" md5="459ae82ebaf56fb279427b1d48e52073" sha1="850db07ea427798e7665c01ba2d9eb05aa198522"/>
+	</game>
+	<game name="3-nen B-gumi Kinpachi Sensei - Densetsu no Kyoudan ni Tate! Kanzenban (Japan)">
+		<category>Games</category>
+		<description>3-nen B-gumi Kinpachi Sensei - Densetsu no Kyoudan ni Tate! Kanzenban (Japan)</description>
+		<rom name="3-nen B-gumi Kinpachi Sensei - Densetsu no Kyoudan ni Tate! Kanzenban (Japan).iso" size="4680515584" crc="f7d43e93" md5="1bf238099ae87c211b3ccd82c1710627" sha1="c952b11c79ebd82aecc7987de9472e2eb282b9c1"/>
 	</game>
 	<game name="3D Mahjong + Janpai Tori (Japan)">
 		<category>Games</category>
 		<description>3D Mahjong + Janpai Tori (Japan)</description>
 		<rom name="3D Mahjong + Janpai Tori (Japan).cue" size="98" crc="73e69918" md5="f06b5686d73cf6aa9bbb6e45c7f650ad" sha1="44aafbfc26352c9376c99536bbb76aa24149c486"/>
 		<rom name="3D Mahjong + Janpai Tori (Japan).bin" size="66046512" crc="bf3c2802" md5="128c8675667131201ea00a7bb1ceed86" sha1="50aa4d752f512a9840004a18e36958c99669b4db"/>
+	</game>
+	<game name="3LDK - Shiawase ni Narou yo (Japan) (Shokai Genteiban)">
+		<category>Games</category>
+		<description>3LDK - Shiawase ni Narou yo (Japan) (Shokai Genteiban)</description>
+		<rom name="3LDK - Shiawase ni Narou yo (Japan) (Shokai Genteiban).iso" size="4642242560" crc="20b33b72" md5="2185a6b1391ceb11257e69e4e4be8384" sha1="fd55ac618acbfaba9be258a93eb07bbe936046ee"/>
+	</game>
+	<game name="4x4 Evo (USA)">
+		<category>Games</category>
+		<description>4x4 Evo (USA)</description>
+		<rom name="4x4 Evo (USA).cue" size="79" crc="a12e759d" md5="2646a3d8debafb45e023f1b050b8fc3c" sha1="d89df6d1ffae13af8f7af69fccd88fcc7df56c72"/>
+		<rom name="4x4 Evo (USA).bin" size="549032064" crc="b24ccf20" md5="1fb309b9ffe3845165735fba4cda791b" sha1="adc27bab83ff675080248b211d2655384f4d9c67"/>
+	</game>
+	<game name="4x4 Evo 2 (Europe) (En,Fr,De)">
+		<category>Games</category>
+		<description>4x4 Evo 2 (Europe) (En,Fr,De)</description>
+		<rom name="4x4 Evo 2 (Europe) (En,Fr,De).cue" size="95" crc="8a105b70" md5="c0f9c7f7600b7c10f3d1600c8487c4f6" sha1="0e397c8fe3a981b76af629db367d0890a1a53463"/>
+		<rom name="4x4 Evo 2 (Europe) (En,Fr,De).bin" size="576207072" crc="e26c91d2" md5="3b23a916c032bec7a38c15e20c85fdf5" sha1="2fe9bd82ed80c1f759a974382abd5fdb0b7af61f"/>
 	</game>
 </datafile>

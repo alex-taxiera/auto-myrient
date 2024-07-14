@@ -294,10 +294,7 @@ pub fn download_rom(
 
         let width = total_download_count
             .checked_ilog10()
-            .unwrap_or(0)
-            .try_into()
-            .unwrap_or(0)
-            + 1;
+            .unwrap_or(0) as usize + 1;
 
         title_bar.set_prefix(format!(
             "{:11} {:width$}/{}: {}",
