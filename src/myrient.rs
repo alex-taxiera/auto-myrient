@@ -21,6 +21,7 @@ const HTTP_CLIENT: Lazy<Client> = Lazy::new(|| Client::new());
 
 const MAX_RETRIES: usize = 3;
 
+const VERB_WIDTH: usize = 11;
 const PROGRESS_PERCENT_PART: &str = "percent:>3";
 const PROGESS_TEMPLATE: &str =
     " | {decimal_bytes:>9} / {decimal_total_bytes} | {bar} | ETA: {eta:>3} | {decimal_bytes_per_sec:>11}";
@@ -212,6 +213,7 @@ pub fn get_roms_for_collection(html: &String) -> HashMap<String, Rom> {
                 Some(title) => match cell_link.attr("href") {
                     None => continue,
                     Some(href) => {
+                        // TODO: handle errors
                         let name = Path::new(&title)
                             .file_stem()
                             .unwrap()
@@ -245,25 +247,30 @@ pub fn download_rom(
     let mut resume_dl = false;
     let mut proceed_dl = true;
 
-    let url = format!("{}{}", constants::MYRIENT_HTTP_ADDR, rom_url);
-    let head = HTTP_CLIENT
-        .head(url.clone())
-        .headers(constants::REQ_HEADERS.clone())
-        .send()?;
+    let local_file_size = if local_path.exists() {
+        // TODO: handle errors
+        local_path.metadata().unwrap().len() - 1
+    } else {
+        0
+    };
 
-    let remote_file_size = head
+    let url = format!("{}{}", constants::MYRIENT_HTTP_ADDR, rom_url);
+
+    let request = HTTP_CLIENT
+        .get(url.clone())
+        .headers(constants::REQ_HEADERS.clone())
+        .header(header::RANGE, &format!("bytes={}-", local_file_size));
+
+    let response = request.send()?;
+
+    let bytes_left_to_download = response
         .headers()
         .get(header::CONTENT_LENGTH)
         .and_then(|ct_len| ct_len.to_str().ok())
         .and_then(|ct_len| ct_len.parse().ok())
         .unwrap_or(0);
 
-    let local_file_size = if local_path.exists() {
-        local_path.metadata().unwrap().len() - 1
-    } else {
-        0
-    };
-    if local_file_size == remote_file_size {
+    if bytes_left_to_download == 0 {
         proceed_dl = false
     } else if local_file_size > 0 {
         resume_dl = true
@@ -271,80 +278,77 @@ pub fn download_rom(
 
     let width = total_download_count.checked_ilog10().unwrap_or(0) as usize + 1;
 
-    if proceed_dl {
-        let mut request = HTTP_CLIENT
-            .get(url.clone())
-            .headers(constants::REQ_HEADERS.clone());
-
-        let multi_progress = MultiProgress::new();
-
-        let title_bar = multi_progress.add(ProgressBar::new(0));
-        let progress_bar = multi_progress.add(ProgressBar::new(remote_file_size));
-
-        title_bar.set_style(ProgressStyle::with_template("{prefix:.cyan}").unwrap());
-        progress_bar.set_style(
-            ProgressStyle::with_template(
-                build_progress_template(
-                    &progress_bar,
-                    &resume_dl.then_some(local_file_size as f64),
-                )
-                .as_str(),
-            )
-            .unwrap()
-            .progress_chars("=> "),
-        );
-
-        title_bar.set_prefix(format!(
-            "{:11} {:width$}/{}: {}",
-            if resume_dl { "Resuming" } else { "Downloading" },
-            file_index,
-            total_download_count,
-            rom.name,
-        ));
-
-        if resume_dl {
-            progress_bar.set_position(local_file_size);
-            request = request.header(header::RANGE, &format!("bytes={}-", local_file_size));
-        }
-
-        let mut reader = DownloadProgress {
-            inner: request.send()?,
-            progress_bar,
-        };
-
-        let mut writer: std::fs::File = std::fs::OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&local_path)
-            .unwrap();
-
-        let _ = io::copy(&mut reader, &mut writer);
-
-        reader.progress_bar.finish_and_clear();
-        title_bar.finish_and_clear();
-
+    if !proceed_dl {
+        // already downloaded, skip
         println!(
             "{}",
             format!(
-                "Downloaded  {:width$}/{}: {}",
-                file_index, total_download_count, rom.name
+                "{:VERB_WIDTH$} {:width$}/{}: {}",
+                "Already DLd", file_index, total_download_count, rom.name
             )
             .green()
         );
 
-        return Ok(writer);
-    } else {
-        println!(
-            "{}",
-            format!(
-                "Already DLd {:width$}/{}: {}",
-                file_index, total_download_count, rom.name
-            )
-            .green()
-        );
+        // TODO: handle errors
+        return Ok(File::open(local_path).unwrap());
     }
 
-    Ok(File::open(local_path).unwrap())
+    let remote_file_size = bytes_left_to_download + local_file_size;
+
+    let multi_progress = MultiProgress::new();
+    let title_bar = multi_progress.add(ProgressBar::new(0));
+    let progress_bar = multi_progress.add(ProgressBar::new(remote_file_size));
+
+    title_bar.set_style(ProgressStyle::with_template("{prefix:.cyan}").unwrap());
+    progress_bar.set_style(
+        ProgressStyle::with_template(
+            build_progress_template(&progress_bar, &resume_dl.then_some(local_file_size as f64))
+                .as_str(),
+        )
+        .unwrap(),
+    );
+
+    title_bar.set_prefix(format!(
+        "{:VERB_WIDTH$} {:width$}/{}: {}",
+        if resume_dl { "Resuming" } else { "Downloading" },
+        file_index,
+        total_download_count,
+        rom.name,
+    ));
+
+    if local_file_size != 0 {
+        // set the progress bar to the current position
+        progress_bar.set_position(local_file_size);
+    }
+
+    let mut reader = DownloadProgress {
+        inner: response,
+        progress_bar,
+    };
+
+    // TODO: handle errors
+    let mut writer: std::fs::File = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&local_path)
+        .unwrap();
+
+    // TODO: handle errors
+    io::copy(&mut reader, &mut writer).unwrap();
+
+    reader.progress_bar.finish_and_clear();
+    title_bar.finish_and_clear();
+
+    println!(
+        "{}",
+        format!(
+            "{:VERB_WIDTH$} {:width$}/{}: {}",
+            "Downloaded", file_index, total_download_count, rom.name
+        )
+        .green()
+    );
+
+    Ok(writer)
 }
 
 // custom error type that includes a vector of the failed Rom objects
@@ -371,29 +375,35 @@ pub fn download_roms(
 ) -> Result<(), BulkDownloadError> {
     let mut roms_with_errors: Vec<Rom> = Vec::new();
 
-    for index in 0..roms.len() {
-        let rom = roms.get(index).unwrap();
-        let result = retry(Exponential::from_millis(100).take(MAX_RETRIES), || {
+    let mut index: usize = 0;
+    for rom in roms {
+        index += 1;
+
+        let download_result = retry(Exponential::from_millis(100).take(MAX_RETRIES), || {
             download_rom(
                 output_dir,
                 &format!("{}{}{}", catalog_url, collection_url, rom.url),
-                rom,
-                &(index + 1),
+                &rom,
+                &index,
                 &roms.len(),
             )
         });
 
-        if result.is_err() {
+        if download_result.is_err() {
             println!("{}", format!("Error with  {}", rom.name).red());
             roms_with_errors.push(rom.clone());
         }
     }
 
-    if roms_with_errors.len() > 0 {
-        return Err(BulkDownloadError {
-            failed_roms: roms_with_errors,
-        });
+    match roms_with_errors.len() {
+        0 => {
+            // no errors, OK
+            return Ok(());
+        }
+        _ => {
+            return Err(BulkDownloadError {
+                failed_roms: roms_with_errors,
+            });
+        }
     }
-
-    Ok(())
 }
