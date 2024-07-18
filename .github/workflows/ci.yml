@@ -155,11 +155,13 @@ jobs:
       - name: Set tag link
         id: gen_link
         run: |
-          echo "TAG_LINK=v1.1.1" | tr -d . >> $GITHUB_OUTPUT
+          echo "TAG_LINK=${{ github.ref_name }}" | tr -d . >> $GITHUB_OUTPUT
 
       - name: Publish
         uses: softprops/action-gh-release@v2
+        env:
+          TAG_LINK: ${{ steps.gen_version.outputs.TAG_LINK }}
         with:
           make_latest: true
           files: "auto-myrient-*"
-          body: "[Changelog](CHANGELOG.md#${{ steps.gen_version.outputs.TAG_LINK }})"
+          body: "[Changelog](CHANGELOG.md#${{ env.TAG_LINK }})"
