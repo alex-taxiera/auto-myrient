@@ -213,19 +213,19 @@ pub fn get_roms_for_collection(html: &String) -> HashMap<String, Rom> {
                 Some(title) => match cell_link.attr("href") {
                     None => continue,
                     Some(href) => {
-                        // TODO: handle errors
+                        // Extract filename without extension, fallback to full title if no extension
                         let name = Path::new(&title)
                             .file_stem()
-                            .unwrap()
-                            .to_string_lossy()
-                            .to_string();
+                            .map(|stem| stem.to_string_lossy().to_string())
+                            .unwrap_or_else(|| title.to_string());
+                        
                         let rom = Rom {
-                            name: name.to_string(),
+                            name: name.clone(),
                             file: title.to_string(),
                             url: href.to_string(),
                         };
 
-                        roms.insert(name.to_string(), rom);
+                        roms.insert(name, rom);
                     }
                 },
             },
